@@ -1,5 +1,5 @@
 {
-    "output_path": "/content/drive/MyDrive/VoiceCloning/agam-zhunio",
+    "output_path": "./TTS_Minang/output",
     "logger_uri": null,
     "run_name": "vits_training_agam",
     "project_name": null,
@@ -71,7 +71,7 @@
     "text_cleaner": "english_cleaners",
     "enable_eos_bos_chars": false,
     "test_sentences_file": "",
-    "phoneme_cache_path": "/content/drive/MyDrive/VoiceCloning/agam-zhunio/phoneme_cache",
+    "phoneme_cache_path": "./TTS_Minang/phoneme_cache",
     "characters": {
         "characters_class": "TTS.tts.utils.text.characters.IPAPhonemes",
         "vocab_dict": null,
@@ -103,7 +103,7 @@
         {
             "formatter": "ljspeech",
             "dataset_name": "",
-            "path": "/content/drive/MyDrive/VoiceCloning/agam-zhunio/dataset/",
+            "path": "",
             "meta_file_train": "metadata.csv",
             "ignored_speakers": null,
             "language": "",
@@ -265,6 +265,6 @@
     "use_d_vector_file": false,
     "d_vector_file": null,
     "d_vector_dim": 0,
-    "restore_path": "/content/drive/MyDrive/VoiceCloning/agam-zhunio/vits_training_agam-March-09-2024_10+51PM-0000000/checkpoint_40000.pth",
+    "restore_path": "",
     "github_branch": "inside_docker"
 }

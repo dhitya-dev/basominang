@@ -6,16 +6,13 @@
 
     <title>BasoMinang</title>
 
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Google Material Symbols -->
     <link
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,300..700,0..1,-50..200"
     />
 
-    <!-- Google Font -->
     <link
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
@@ -23,19 +20,16 @@
   </head>
 
   <body
-    class="min-h-screen bg-[url('../static/background.png')] bg-cover bg-center bg-no-repeat font-[Inter] text-slate-800"
+    class="min-h-screen bg-cover bg-center bg-no-repeat font-[Inter] text-slate-800"
+    style="background-image: url('{{ url_for('static', filename='Background.png') }}')"
   >
-    <!-- Overlay -->
     <div
       class="min-h-screen w-full bg-gradient-to-b from-white/35 via-white/10 to-transparent"
     >
-      <!-- Main -->
       <main
         class="mx-auto flex min-h-screen w-full max-w-6xl flex-col items-center px-5 pb-8 pt-6 sm:px-8 lg:pt-7"
       >
-        <!-- Header -->
         <div class="mb-4 max-w-2xl text-center">
-          <!-- Badge -->
           <div
             class="mx-auto mb-2 inline-flex items-center gap-2 rounded-full border border-[#b95848]/20 bg-white px-4 py-1.5 text-[11px] font-semibold text-[#a5463a]"
           >
@@ -45,16 +39,14 @@
 
             Penerjemah Indonesia · Minangkabau
           </div>
-          <!-- Logo -->
           <div class="flex justify-center">
             <img
-              src="../static/logo.png"
+              src="{{ url_for('static', filename='logo.png') }}"
               alt="BasoMinang"
               class="w-[245px] object-contain sm:w-[290px]"
             />
           </div>
 
-          <!-- Description -->
           <p
             class="mx-auto mt-1.5 max-w-xl text-[13px] leading-5 text-slate-600 sm:text-sm"
           >
@@ -63,15 +55,12 @@
           </p>
         </div>
 
-        <!-- Translator Card -->
         <section
           class="w-full max-w-[950px] rounded-[24px] border border-white/70 bg-white/75 p-3 shadow-[0_18px_50px_rgba(87,61,50,0.14)] backdrop-blur-xl sm:p-4"
         >
-          <!-- Language Selector -->
           <div
             class="relative flex w-full items-center rounded-[16px] border border-slate-200/80 bg-white/80 p-1 shadow-sm"
           >
-            <!-- Left Language -->
             <div
               class="flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-2"
             >
@@ -80,7 +69,6 @@
               </span>
             </div>
 
-            <!-- Swap Button -->
             <button
               type="button"
               onclick="swapLanguages()"
@@ -94,7 +82,6 @@
               </span>
             </button>
 
-            <!-- Right Language -->
             <div
               class="flex flex-1 items-center justify-center gap-2 rounded-xl px-4 py-2"
             >
@@ -104,13 +91,10 @@
             </div>
           </div>
 
-          <!-- Translation Area -->
           <div class="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2">
-            <!-- ==================== INPUT ==================== -->
             <div
               class="group flex min-h-[205px] flex-col rounded-[18px] border border-slate-200 bg-white/90 p-4 shadow-sm transition duration-300 focus-within:border-[#a5463a]/40 focus-within:shadow-[0_8px_25px_rgba(165,70,58,0.08)]"
             >
-              <!-- Header -->
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
                   <div
@@ -137,7 +121,6 @@
                   </div>
                 </div>
 
-                <!-- Clear -->
                 <button
                   onclick="clearText('text1')"
                   type="button"
@@ -150,17 +133,16 @@
                 </button>
               </div>
 
-              <!-- Textarea -->
               <textarea
                 id="text1"
                 data-lang="indo"
+                maxlength="1000"
                 maxlength="1000"
                 oninput="updateCharacterCount()"
                 placeholder="Masukkan teks yang ingin diterjemahkan..."
                 class="mt-3 min-h-[85px] w-full flex-1 resize-none bg-transparent text-[15px] leading-6 text-slate-800 outline-none placeholder:text-slate-300"
               ></textarea>
 
-              <!-- Footer -->
               <div
                 class="mt-2 flex items-center justify-between border-t border-slate-100 pt-2"
               >
@@ -169,7 +151,6 @@
                 </span>
 
                 <div class="flex items-center gap-1">
-                  <!-- Copy -->
                   <button
                     onclick="copyText('text1')"
                     type="button"
@@ -181,7 +162,6 @@
                     </span>
                   </button>
 
-                  <!-- Sound -->
                   <button
                     onclick="playAudio('text1')"
                     type="button"
@@ -196,11 +176,9 @@
               </div>
             </div>
 
-            <!-- ==================== OUTPUT ==================== -->
             <div
               class="flex min-h-[205px] flex-col rounded-[18px] border border-slate-200 bg-[#fffdfa]/95 p-4 shadow-sm"
             >
-              <!-- Header -->
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
                   <div
@@ -227,7 +205,6 @@
                   </div>
                 </div>
 
-                <!-- Clear -->
                 <button
                   onclick="clearText('text2')"
                   type="button"
@@ -240,7 +217,6 @@
                 </button>
               </div>
 
-              <!-- Output -->
               <textarea
                 id="text2"
                 data-lang="minang"
@@ -249,12 +225,10 @@
                 class="mt-3 min-h-[85px] w-full flex-1 resize-none bg-transparent text-[15px] leading-6 text-slate-800 outline-none placeholder:text-slate-300"
               ></textarea>
 
-              <!-- Footer -->
               <div
                 class="mt-2 flex items-center justify-end border-t border-slate-100 pt-2"
               >
                 <div class="flex items-center gap-1">
-                  <!-- Copy -->
                   <button
                     onclick="copyText('text2')"
                     type="button"
@@ -266,7 +240,6 @@
                     </span>
                   </button>
 
-                  <!-- Sound -->
                   <button
                     onclick="playAudio('text2')"
                     type="button"
@@ -282,7 +255,6 @@
             </div>
           </div>
 
-          <!-- Translate Button -->
           <div class="mt-3 flex justify-center">
             <button
               onclick="translateText()"
@@ -298,210 +270,16 @@
           </div>
         </section>
 
-        <!-- Footer -->
         <p class="mt-3 text-center text-[10px] text-slate-500/80">
           BasoMinang · Indonesia & Minangkabau Translator
         </p>
 
-        <!-- Audio -->
         <audio id="audioPlayer" class="hidden">
           <source id="audioSource" type="audio/wav" />
         </audio>
       </main>
     </div>
 
-    <script>
-      function clearText(id) {
-        document.getElementById(id).value = "";
-
-        if (id === "text1") {
-          updateCharacterCount();
-        }
-      }
-
-      function updateCharacterCount() {
-        const text = document.getElementById("text1").value;
-
-        document.getElementById("characterCount").innerText =
-          `${text.length} / 1000`;
-      }
-
-      async function copyText(id) {
-        const text = document.getElementById(id).value;
-
-        if (!text) return;
-
-        try {
-          await navigator.clipboard.writeText(text);
-        } catch (error) {
-          const textArea = document.getElementById(id);
-
-          textArea.select();
-
-          document.execCommand("copy");
-        }
-      }
-
-      function translateText() {
-        const inputText = document.getElementById("text1").value.trim();
-
-        if (!inputText) {
-          alert("Masukkan teks terlebih dahulu.");
-          return;
-        }
-
-        const lang1 = document.getElementById("lang1").innerText.trim();
-
-        const langMode = lang1 === "Indonesia" ? "indo_minang" : "minang_indo";
-
-        const button = document.getElementById("translateButton");
-
-        const originalButton = button.innerHTML;
-
-        button.disabled = true;
-
-        button.innerHTML = `
-          <span
-            class="material-symbols-rounded animate-spin text-[18px]"
-          >
-            progress_activity
-          </span>
-
-          <span>Menerjemahkan...</span>
-        `;
-
-        fetch("/translate", {
-          method: "POST",
-
-          headers: {
-            "Content-Type": "application/json",
-          },
-
-          body: JSON.stringify({
-            text: inputText,
-            lang: langMode,
-          }),
-        })
-          .then((response) => {
-            if (!response.ok) {
-              throw new Error("Gagal menerjemahkan");
-            }
-
-            return response.json();
-          })
-
-          .then((data) => {
-            document.getElementById("text2").value = data.translated_text;
-          })
-
-          .catch((error) => {
-            console.error("Error:", error);
-
-            alert("Terjadi kesalahan saat menerjemahkan.");
-          })
-
-          .finally(() => {
-            button.disabled = false;
-
-            button.innerHTML = originalButton;
-          });
-      }
-
-      function swapLanguages() {
-        const lang1 = document.getElementById("lang1");
-
-        const lang2 = document.getElementById("lang2");
-
-        const label1 = document.getElementById("label1");
-
-        const label2 = document.getElementById("label2");
-
-        const text1 = document.getElementById("text1");
-
-        const text2 = document.getElementById("text2");
-
-        const oldLang1 = lang1.innerText.trim();
-
-        const oldLang2 = lang2.innerText.trim();
-
-        lang1.innerText = oldLang2;
-
-        lang2.innerText = oldLang1;
-
-        label1.innerText = oldLang2;
-
-        label2.innerText = oldLang1;
-
-        const oldText1 = text1.value;
-
-        text1.value = text2.value;
-
-        text2.value = oldText1;
-
-        text1.setAttribute(
-          "data-lang",
-          oldLang2 === "Minangkabau" ? "minang" : "indo",
-        );
-
-        text2.setAttribute(
-          "data-lang",
-          oldLang1 === "Indonesia" ? "indo" : "minang",
-        );
-
-        updateCharacterCount();
-      }
-
-      function playAudio(textareaId) {
-        const element = document.getElementById(textareaId);
-
-        const text = element.value.trim();
-
-        if (!text) {
-          alert("Tidak ada teks untuk diucapkan!");
-
-          return;
-        }
-
-        const lang = element.getAttribute("data-lang");
-
-        fetch("/speak", {
-          method: "POST",
-
-          headers: {
-            "Content-Type": "application/json",
-          },
-
-          body: JSON.stringify({
-            text: text,
-            lang: lang,
-          }),
-        })
-          .then((response) => response.json())
-
-          .then((data) => {
-            if (!data.audio_url) {
-              alert("Gagal menghasilkan audio!");
-
-              return;
-            }
-
-            const audio = document.getElementById("audioPlayer");
-
-            const source = document.getElementById("audioSource");
-
-            source.src = data.audio_url + "?t=" + new Date().getTime();
-
-            audio.load();
-
-            audio.play();
-          })
-
-          .catch((error) => {
-            console.error("Error:", error);
-
-            alert("Gagal memutar audio.");
-          });
-      }
-    </script>
+    <script src="{{ url_for('static', filename='scripts.js') }}" defer></script>
   </body>
 </html>

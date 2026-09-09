@@ -1,153 +1,168 @@
 import re
-import mysql.connector
-
-# 🔁 Kamus akhiran
-konversi_akhiran = {'lah': 'lah', 'nyo': 'nya', 'kan': 'kan', 'an': 'an', 'i': 'i'}
-konversi_awalan = {'man': 'men', 'pang': 'peng', 'basi': 'bersi', 'ka': 'ke', 'sa': 'se' }
-# 🔁 Daftar imbuhan yang digunakan untuk pemisahan awalan dan akhiran
-daftar_awalan = ['mampa', 'bapa', 'tapa', 'sapa', 'baku', 'pang', 'basi', 'pan', 'man', 'bo', 'ba', 'ma', 'pa', 'ta', 'no', 'di', 'ka', 'sa']
-daftar_akhiran = ['lah', 'nyo', 'kan', 'an', 'i']
 
 
-# Tokenisasi teks
+SUFFIX_CONVERSIONS = {
+    "lah": "lah",
+    "nyo": "nya",
+    "kan": "kan",
+    "an": "an",
+    "i": "i",
+}
+PREFIX_CONVERSIONS = {
+    "man": "men",
+    "pang": "peng",
+    "basi": "bersi",
+    "ka": "ke",
+    "sa": "se",
+}
+PREFIXES = [
+    "mampa",
+    "bapa",
+    "tapa",
+    "sapa",
+    "baku",
+    "pang",
+    "basi",
+    "pan",
+    "man",
+    "bo",
+    "ba",
+    "ma",
+    "pa",
+    "ta",
+    "no",
+    "di",
+    "ka",
+    "sa",
+]
+SUFFIXES = ["lah", "nyo", "kan", "an", "i"]
+NOUN_CATEGORIES = {
+    "Kata Benda",
+    "Kata Benda Status",
+    "Kata Benda Alat",
+    "Kata Benda Makhluk Hidup",
+}
+ADJECTIVE_CATEGORIES = {"Kata Sifat", "Kata Sifat Kebiasaan"}
+
+
 def pecah_teks(teks):
-    return re.findall(r"\w+(?:-\w+)*|[.,!?;]", teks)
+    return re.findall(r"\w+(?:-\w+)*|[^\w\s]", teks, flags=re.UNICODE)
 
-# 📌 Fungsi utama
-def terjemahkan_teks(teks, kamus):
-    token = pecah_teks(teks)
-    token_terjemahan = [terjemahkan_kata(kata, kamus) for kata in token]
-    return ''.join(
-        f' {t}' if i > 0 and re.match(r"\w+", t) else t
-        for i, t in enumerate(token_terjemahan)
-    )
 
-# 📌 Pisahkan akhiran
+def terjemahkan_teks(teks, kamus, kategori=None):
+    categories = kategori or {}
+    translated_tokens = [
+        terjemahkan_kata(token, kamus, categories) for token in pecah_teks(teks)
+    ]
+    return re.sub(r"\s+([.,!?;])", r"\1", " ".join(translated_tokens))
+
+
 def pisah_akhiran(kata, daftar_akhiran, kamus):
     if kata in kamus:
-        return kata, ''
-    for akhiran in sorted(daftar_akhiran, key=len, reverse=True): 
-        if kata.endswith(akhiran):
-            calon = kata[:-len(akhiran)]
-            return calon, akhiran  
-    return kata, ''
+        return kata, ""
+
+    for suffix in sorted(daftar_akhiran, key=len, reverse=True):
+        if kata.endswith(suffix) and len(kata) > len(suffix):
+            return kata[: -len(suffix)], suffix
+
+    return kata, ""
 
 
-# 📌 Pisahkan awalan
-def pisah_awalan(kata, daftar_awalan):
-    for awalan in sorted(daftar_awalan, key=len, reverse=True):
-        if kata.startswith(awalan):
-            sisa = kata[len(awalan):]
-            id_kata, kategori, _ = ambil_kategori_dan_terjemahan_kata(sisa)
-            if id_kata:
-                return awalan, sisa
-    return '', kata
+def pisah_awalan(kata, daftar_awalan, kamus):
+    for prefix in sorted(daftar_awalan, key=len, reverse=True):
+        remainder = kata[len(prefix) :]
+        if kata.startswith(prefix) and remainder in kamus:
+            return prefix, remainder
+    return "", kata
 
-# 📌 Ambil data dari DB
-def ambil_kategori_dan_terjemahan_kata(kata):
-    try:
-        conn = mysql.connector.connect(
-            host="localhost", user="root", password="", database="terjemahan"
-        )
-        cursor = conn.cursor()
-        cursor.execute("SELECT id, kategori, kata_indo FROM minangkabau WHERE LOWER(kata_minang) = %s", (kata.lower(),))
-        hasil = cursor.fetchone()
-        conn.close()
-        if hasil:
-            return hasil
-        return None, None, None
-    except mysql.connector.Error:
-        return None, None, None
 
-# 📌 Ganti awalan dan akhiran
-def ganti_awalan_akhiran(awalan, kata_dasar, akhiran):
+def convert_prefix(prefix, category):
+    converted = PREFIX_CONVERSIONS.get(prefix, prefix)
 
-    id_kata, kategori, kata_dasar_terjemahan = ambil_kategori_dan_terjemahan_kata(kata_dasar)
-    if kata_dasar_terjemahan:
-        kata_dasar_terjemahan = kata_dasar_terjemahan.lower()
+    if prefix == "sapa" and category == "Kata Bilangan":
+        return "seper"
+    if prefix == "tapa" and category in {"Kata Bilangan", *ADJECTIVE_CATEGORIES}:
+        return "dijadikan "
+    if prefix == "bapa" and category in {"Kata Bilangan", *ADJECTIVE_CATEGORIES}:
+        return "dijadikan "
+    if prefix == "ta" and category in {
+        "Kata Kerja",
+        *ADJECTIVE_CATEGORIES,
+        *NOUN_CATEGORIES,
+    }:
+        return "ter"
+    if prefix == "no" and category == "Kata Kerja":
+        return "di"
+    if prefix == "mampa":
+        if category == "Kata Bilangan":
+            return "membagi "
+        if category in {*NOUN_CATEGORIES, *ADJECTIVE_CATEGORIES}:
+            return "memper"
+    if prefix == "baku" and category == "Kata Kerja":
+        return "ber"
+    if prefix == "pa":
+        if category == "Kata Sifat Kebiasaan":
+            return "pe"
+        if category == "Kata Sifat":
+            return "memper"
+        if category == "Kata Benda Status":
+            return "menjadikan "
+        if category == "Kata Benda Makhluk Hidup":
+            return "memanggilkan "
+        if category == "Kata Bilangan":
+            return "bagi "
+    if prefix == "pan":
+        if category == "Kata Kerja":
+            return "pen"
+        if category == "Kata Benda Alat":
+            return "peng"
+        if category == "Kata Sifat Kebiasaan":
+            return "pe"
+    if prefix == "ma" and category in {
+        "Kata Kerja",
+        *NOUN_CATEGORIES,
+        *ADJECTIVE_CATEGORIES,
+    }:
+        return "me"
+    if prefix == "bo" and category == "Kata Kerja Pasif":
+        return "di"
+    if prefix == "ba" and category in {
+        "Kata Kerja",
+        "Kata Bilangan",
+        *NOUN_CATEGORIES,
+        *ADJECTIVE_CATEGORIES,
+    }:
+        return "ber"
 
-    awalan_baru = konversi_awalan.get(awalan, awalan)
-    if awalan == 'sapa' and kategori == "Kata Bilangan":
-        awalan_baru = 'seper'
-    elif awalan == 'tapa' and kategori in ["Kata Bilangan", "Kata Sifat", "Kata Sifat Kebiasaan"]:
-        awalan_baru = 'Dijadikan '
-    elif awalan == 'bapa' and kategori in ["Kata Bilangan", "Kata Sifat", "Kata Sifat Kebiasaan"]:
-        awalan_baru = 'dijadikan '
-    elif awalan == 'ta' and kategori in ["Kata Kerja", "Kata Sifat", "Kata Sifat Kebiasaan", "Kata Benda", "Kata Benda Status", "Kata Benda Alat", "Kata Benda Makhluk Hidup"]:
-        awalan_baru = 'ter'
-    elif awalan == 'no' and kategori == "Kata Kerja":
-        awalan_baru = 'di'
-    elif awalan == 'mampa':
-        if kategori == "Kata Bilangan":
-            awalan_baru = 'membagi '
-        elif kategori in ["Kata Benda", "Kata Benda Status", "Kata Benda Alat", "Kata Benda Makhluk Hidup", "Kata Sifat", "Kata Sifat Kebiasaan"]:
-            awalan_baru = 'memper'
-    elif awalan == 'baku' and kategori == "Kata Kerja":
-        awalan_baru = 'ber'
-    # AWALAN Pa
-    elif awalan == 'pa':
-        if kategori == "Kata Sifat Kebiasaan":
-            awalan_baru = 'pe'
-        elif kategori in ["Kata Sifat", "Kata Sifat Kebiasaan"]:
-            awalan_baru = 'memper'
-        elif kategori == "Kata Benda Status":
-            awalan_baru = 'menjadikan '
-        elif kategori == "Kata Benda Makhluk Hidup":
-            awalan_baru = 'memanggilkan '
-        elif kategori == "Kata Bilangan":
-            awalan_baru = 'bagi '
-    # Awalan Pan
-    elif awalan == 'pan':
-        if kategori == "Kata Kerja":
-            awalan_baru = 'pen'
-        elif kategori == "Kata Benda Alat":
-            awalan_baru = 'peng'
-        elif kategori == "Kata Sifat Kebiasaan":
-            awalan_baru = 'pe'
-    elif awalan == 'ma' and kategori in ["Kata Kerja", "Kata Benda", "Kata Benda Status", "Kata Benda Alat", "Kata Benda Makhluk Hidup", "Kata Sifat", "Kata Sifat Kebiasaan"]:
-        awalan_baru = 'me'
-    elif awalan == 'bo' and kategori == "Kata Kerja Pasif":
-        awalan_baru = 'di'
-    elif awalan == 'ba' and kategori in ["Kata Kerja", "Kata Benda", "Kata Benda Status", "Kata Benda Alat", "Kata Benda Makhluk Hidup", "Kata Sifat", "Kata Sifat Kebiasaan", "Kata Bilangan"]:
-        awalan_baru = 'ber'
+    return converted
 
-    akhiran_baru = konversi_akhiran.get(akhiran, '')
-    return awalan_baru, kata_dasar_terjemahan or kata_dasar, akhiran_baru, id_kata
 
-# 📌 Pertahankan kapitalisasi awal
 def kembalikan_kapitalisasi(asli, terjemahan):
-    if asli[0].isupper():
-        return terjemahan[0].upper() + terjemahan[1:]
-    elif asli.isupper():
+    if asli.isupper():
         return terjemahan.upper()
+    if asli[:1].isupper():
+        return terjemahan[:1].upper() + terjemahan[1:]
     return terjemahan
 
-# 📌 Fungsi inti
-def terjemahkan_kata(kata, kamus):
-    print(f"\n Kata Asli: {kata}")
-    kata_kecil = kata.lower()
 
-    if kata_kecil in kamus:
-        hasil = kembalikan_kapitalisasi(kata, kamus[kata_kecil])
-        print(f" Ditemukan langsung di kamus: {hasil}")
-        return hasil
+def terjemahkan_kata(kata, kamus, kategori=None):
+    categories = kategori or {}
+    normalized_word = kata.lower()
 
-    kata_dasar, akhiran = pisah_akhiran(kata_kecil, daftar_akhiran, kamus)
-    print(f" Pisah akhiran → Kata Dasar: {kata_dasar} | Akhiran: {akhiran}")
+    if normalized_word in kamus:
+        return kembalikan_kapitalisasi(kata, kamus[normalized_word])
 
-    if kata_dasar in kamus:
-        akhiran_baru = konversi_akhiran.get(akhiran, '')
-        hasil = kembalikan_kapitalisasi(kata, kamus[kata_dasar] + akhiran_baru)
-        print(f" Ditemukan kata dasar di kamus: {hasil}")
-        return hasil
-    
+    root_word, suffix = pisah_akhiran(normalized_word, SUFFIXES, kamus)
+    if root_word in kamus:
+        result = kamus[root_word] + SUFFIX_CONVERSIONS.get(suffix, "")
+        return kembalikan_kapitalisasi(kata, result)
 
-    awalan, kata_dasar = pisah_awalan(kata_dasar, daftar_awalan)
-    print(f" Pisah awalan → Awalan: {awalan} | Sisa: {kata_dasar}")
-    awalan_baru, kata_dasar_terjemahan, akhiran_baru, _ = ganti_awalan_akhiran(awalan, kata_dasar, akhiran)
-    print(f" Konversi → Awalan Baru: {awalan_baru} | Dasar Terjemahan: {kata_dasar_terjemahan} | Akhiran Baru: {akhiran_baru}")
+    prefix, root_word = pisah_awalan(root_word, PREFIXES, kamus)
+    if root_word not in kamus:
+        return kata
 
-    kata_terjemahan_akhir = awalan_baru + kata_dasar_terjemahan + akhiran_baru
-    hasil = kembalikan_kapitalisasi(kata, kata_terjemahan_akhir)
-    print(f" Hasil Akhir Terjemahan: {hasil}")
-    return hasil
+    category = categories.get(root_word)
+    converted_prefix = convert_prefix(prefix, category)
+    converted_suffix = SUFFIX_CONVERSIONS.get(suffix, "")
+    result = converted_prefix + kamus[root_word] + converted_suffix
+    return kembalikan_kapitalisasi(kata, result)

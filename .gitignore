@@ -1,0 +1,16 @@
+.env
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+*.egg-info/
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+static/generated/
+static/output.wav
+TTS_Indo/*.bin
+TTS_Indo/*.safetensors
+TTS_Minang/*.pth
