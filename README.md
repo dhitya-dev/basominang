@@ -15,12 +15,16 @@ BasoMinang adalah penerjemah dua arah Bahasa Indonesia dan Bahasa Minangkabau. p
 
 ## Arsitektur
 
+## Arsitektur
+
+```text
 basominang/
 ├── static/
-│ ├── Background.png
-│ ├── logo.png
-│ └── scripts.js
-├── templates/index.html
+│   ├── Background.png
+│   ├── logo.png
+│   └── scripts.js
+├── templates/
+│   └── index.html
 ├── app.py
 ├── config.py
 ├── database.py
@@ -29,7 +33,8 @@ basominang/
 ├── speech.py
 ├── translation_service.py
 ├── terjemahan.sql
-└── requirements\*.txt
+└── requirements*.txt
+```
 
 ## Menjalankan proyek
 
