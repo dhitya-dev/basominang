@@ -15,8 +15,6 @@ BasoMinang adalah penerjemah dua arah Bahasa Indonesia dan Bahasa Minangkabau. p
 
 ## Arsitektur
 
-## Arsitektur
-
 ```text
 basominang/
 ├── static/
